@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/lyargoos/Welcome">
+    <file>ui/window.ui</file>
+    <file>ui/stack/main.ui</file>
+    <file>ui/stack/log.ui</file>
+    <file>images/logo.svg</file>
+  </gresource>
+</gresources>

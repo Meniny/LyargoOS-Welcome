@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+
+usage()
+{
+	cat <<_EOF
+\`configure' configures LyargoOS Welcome
+
+--prefix=DIR 		Install architecture-independent files in PREFIX
+--bindir=DIR 		Executables [PREFIX/bin]
+--libexecdir=DIR	Program executables [PREFIX/libexec]
+--datadir=DIR 		Read-only architecture-independent data [PREFIX/share]
+_EOF
+	exit 1
+}
+
+for x; do
+	opt=${x%%=*}
+	var=${x#*=}
+	case "$opt" in
+	--prefix) PREFIX=$var;;
+	--bindir) BINDIR=$var;;
+	--libexecdir) LIBEXECDIR=$var;;
+	--datadir) SHAREDIR=$var;;
+	--help) usage;;
+	*) echo "$0: WARNING: unknown option $opt" >&2;;
+	esac
+done
+
+: ${SED:=sed}
+
+: ${PREFIX:=/usr/local}
+: ${BINDIR:=${PREFIX}/bin}
+: ${LIBEXECDIR:=${PREFIX}/libexec}
+: ${SHAREDIR:=${PREFIX}/share}
+
+_which()
+{
+	x="$(command -v "$1" 2>/dev/null)"
+	if [ -n "$x" ]; then
+		echo "$x"
+		return 0
+	fi
+	for x in /sbin/"$1" /usr/sbin/"$1" \
+		/usr/pkg/sbin/"$1" /usr/local/sbin/"$1"
+	do
+		if [ -e "$x" ]; then
+			echo "$x"
+			return 0
+		fi
+	done
+	return 1
+}
+
+CONFIG_MK=config.mk
+
+echo "Configuring LyargoOS Welcome ..."
+rm -f $CONFIG_MK
+echo "# Common vars used by LyargoOS Welcome." >$CONFIG_MK
+
+echo "PREFIX ?=	$PREFIX" >>$CONFIG_MK
+echo "BINDIR ?= $BINDIR" >>$CONFIG_MK
+echo "LIBEXECDIR ?= $LIBEXECDIR" >>$CONFIG_MK
+echo "SHAREDIR ?= $SHAREDIR" >>$CONFIG_MK
+
+#
+# cargo is required... duh
+#
+printf "Checking for cargo ... "
+CARGO_BIN=$(_which cargo)
+if [ -z "$CARGO_BIN" ]; then
+	echo "not found, exiting."
+	exit 1
+else
+	echo yes
+fi
+
+#
+# blueprint-compiler is required to compile .blp UI files.
+#
+printf "Checking for blueprint-compiler ... "
+BLUEPRINT_BIN=$(_which blueprint-compiler)
+if [ -z "$BLUEPRINT_BIN" ]; then
+	echo "not found, exiting."
+	exit 1
+else
+	echo yes
+fi
+
+#
+# pkg-config is required to know dependencies for static linking.
+#
+printf "Checking for pkg-config ... "
+PKGCONFIG_BIN=$(_which pkg-config)
+if [ -z "$PKGCONFIG_BIN" ]; then
+	echo "not found, exiting."
+	exit 1
+else
+	echo yes
+fi
+
+#
+# gtk4 with pkg-config support is required.
+#
+GTK4_REQVER=4.12
+
+printf "Checking for gtk4 >= ${GTK4_REQVER}  via pkg-config ... "
+if ! $PKGCONFIG_BIN --atleast-version=${GTK4_REQVER} gtk4; then
+	echo "gtk4 >= ${GTK4_REQVER} not found, exiting."
+	exit 1
+else
+	echo "found version $($PKGCONFIG_BIN --modversion gtk4)."
+fi
+
+#
+# gio-2.0 with pkg-config support is required.
+#
+GIO_REQVER=2.76
+
+printf "Checking for gio-2.0 >= ${GIO_REQVER}  via pkg-config ... "
+if ! $PKGCONFIG_BIN --atleast-version=${GIO_REQVER} gio-2.0; then
+	echo "gio-2.0 >= ${GIO_REQVER} not found, exiting."
+	exit 1
+else
+	echo "found version $($PKGCONFIG_BIN --modversion gio-2.0)."
+fi
+
+sed \
+	-e "s|@SCRIPTSDIR@|\"$LIBEXECDIR/lyargoos-welcome/scripts\"|" \
+	-e "s|@PKGDATADIR@|\"$SHAREDIR/lyargoos-welcome\"|" \
+	src/config.rs.in > src/config.rs
+
+for script in scripts/*.sh.in; do
+	sed \
+		-e "s|@SCRIPTSDIR@|$LIBEXECDIR/lyargoos-welcome/scripts|" \
+		${script} > scripts/$(basename -s .in $script)
+done
+
+sed \
+	-e "s|@BIN@|$BINDIR/lyargoos-welcome|" \
+	data/org.lyargoos.Welcome.desktop.in > data/org.lyargoos.Welcome.desktop
+
+echo
+echo "  LyargoOS Welcome has been configured with the following options:"
+echo
+echo "   PREFIX =			$PREFIX"
+echo "   BINDIR =			$BINDIR"
+echo "   LIBEXECDIR =		$LIBEXECDIR"
+echo "   SHAREDIR =		$SHAREDIR"
+echo
+echo "  You can now run make && make install clean."
+echo
+
+exit 0

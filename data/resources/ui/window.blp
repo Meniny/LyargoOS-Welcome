@@ -1,0 +1,26 @@
+using Gtk 4.0;
+
+template $Window: ApplicationWindow {
+	title: _("Welcome to LyargoOS");
+	default-width: 1100;
+	default-height: 650;
+	resizable: false;
+
+	child: Stack stack {
+		StackPage {
+			name: "main";
+
+			child: ScrolledWindow {
+				child: $StackPageMain stack_page_main {};
+			};
+		}
+
+		StackPage {
+			name: "log";
+
+			child: ScrolledWindow {
+				child: $StackPageLog stack_page_log {};
+			};
+		}
+	};
+}

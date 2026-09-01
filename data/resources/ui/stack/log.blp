@@ -1,0 +1,43 @@
+using Gtk 4.0;
+
+template $StackPageLog: Box {
+	orientation: vertical;
+	margin-top: 20;
+	margin-bottom: 20;
+	margin-start: 20;
+	margin-end: 20;
+	spacing: 8;
+
+	ScrolledWindow {
+		vexpand: true;
+
+		TextView text_view_log {
+			editable: false;
+			cursor-visible: false;
+		}
+	}
+
+	Box box_confirmation {
+		height-request: 48;
+		spacing: 8;
+
+		Button button_cancel {
+			hexpand: true;
+			label: _("Cancel");
+			clicked => $on_button_cancel_clicked() swapped;
+		}
+
+		Button button_proceed {
+			hexpand: true;
+			label: _("Proceed");
+			clicked => $on_button_proceed_clicked() swapped;
+		}
+	}
+
+	Button button_return {
+		label: _("Return");
+		height-request: 48;
+		visible: false;
+		clicked => $on_button_return_clicked() swapped;
+	}
+}

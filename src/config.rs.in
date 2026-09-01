@@ -1,0 +1,9 @@
+#[cfg(debug_assertions)]
+pub static PKGDATADIR: &str = "data/resources";
+#[cfg(not(debug_assertions))]
+pub static PKGDATADIR: &str = @PKGDATADIR@;
+
+#[cfg(debug_assertions)]
+pub static SCRIPTSDIR: &str = "scripts";
+#[cfg(not(debug_assertions))]
+pub static SCRIPTSDIR: &str = @SCRIPTSDIR@;

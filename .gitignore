@@ -1,0 +1,8 @@
+/target
+data/resources/ui/**/*.ui
+data/resources/resources.gresource
+data/org.lyargoos.Welcome.desktop
+src/config.rs
+config.mk
+scripts/*.sh
+_prefix

@@ -1,0 +1,100 @@
+using Gtk 4.0;
+
+template $StackPageMain: Box {
+	orientation: vertical;
+	margin-top: 20;
+	margin-bottom: 20;
+	margin-start: 20;
+	margin-end: 20;
+	spacing: 16;
+
+	Box {
+		orientation: horizontal;
+		spacing: 16;
+
+		Image {
+			resource: "/org/lyargoos/Welcome/images/logo.svg";
+			pixel-size: 250;
+			valign: center;
+
+			accessibility {
+				label: "LyargoOS Logo";
+			}
+		}
+
+		Box {
+			orientation: vertical;
+			spacing: 6;
+			valign: center;
+
+			Label {
+				label: _("Welcome to LyargoOS");
+				halign: start;
+
+				styles [
+					"title-1",
+				]
+			}
+
+			Label {
+				label: _(
+					"This tool provides quick access to system updates and virtualization setup."
+				);
+				halign: start;
+				wrap: true;
+				max-width-chars: 80;
+			}
+
+			Label {
+				label: _("\nHave questions or feedback? Visit our GitHub repository.");
+				halign: start;
+				wrap: true;
+				max-width-chars: 80;
+			}
+		}
+	}
+
+	Box {
+		orientation: vertical;
+		spacing: 8;
+		vexpand: true;
+
+		Button button_system_update {
+			label: _("System update");
+			height-request: 48;
+			clicked => $on_button_system_update_clicked() swapped;
+		}
+
+		Button button_virt_manager {
+			label: _("Install virt-manager");
+			height-request: 48;
+			clicked => $on_button_virt_manager_clicked() swapped;
+		}
+	}
+
+	Box {
+		orientation: horizontal;
+
+		LinkButton {
+			label: _("Source code");
+			uri: "https://github.com/Meniny/LyargoOS";
+			tooltip-text: _("Source Code");
+		}
+
+		Box {
+			hexpand: true;
+			halign: end;
+			spacing: 8;
+
+			Label {
+				label: _("Launch on startup");
+				halign: start;
+			}
+
+			Switch switch_autostart {
+				valign: center;
+				state-set => $on_switch_autostart_state_set() swapped;
+			}
+		}
+	}
+}

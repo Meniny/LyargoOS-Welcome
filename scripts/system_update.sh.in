@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+xbps-install -S && xbps-install -uy xbps && xbps-install -Suy

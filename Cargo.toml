@@ -1,0 +1,12 @@
+[package]
+name = "lyargoos-welcome"
+version = "0.1.0"
+authors = ["LyargoOS <meniny@qq.com>"]
+edition = "2024"
+description = "LyargoOS Welcome Screen"
+repository = "https://github.com/Meniny/LyargoOS-Welcome"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+gio = { version = "0.22.6", features = ["v2_76"] }
+gtk = { version = "0.11.3", package = "gtk4", features = ["v4_12"] }

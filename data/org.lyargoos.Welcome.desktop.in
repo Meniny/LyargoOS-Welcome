@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+
+Name=LyargoOS Welcome
+Comment=LyargoOS Welcome Screen
+Categories=System;GTK;
+
+Icon=org.lyargoos.Welcome
+Exec=@BIN@
+Terminal=false

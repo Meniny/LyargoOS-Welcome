@@ -1,0 +1,85 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v0.1.0)'
+        required: false
+        type: string
+      release:
+        description: 'Create GitHub Release'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [x86_64]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cargo \
+          blueprint-compiler \
+          libgtk-4-dev \
+          libglib2.0-dev \
+          pkg-config
+
+    - name: Configure
+      run: ./configure --prefix=/usr
+
+    - name: Build
+      run: make build CARGO_OPTS=--release
+
+    - name: Prepare package
+      env:
+        TAG: ${{ github.event.inputs.tag }}
+        ARCH: ${{ matrix.arch }}
+      run: |
+        mkdir -p package/usr/bin
+        mkdir -p package/usr/libexec/lyargoos-welcome/scripts
+        mkdir -p package/usr/share/lyargoos-welcome
+        
+        cp target/release/lyargoos-welcome package/usr/bin/
+        cp scripts/*.sh package/usr/libexec/lyargoos-welcome/scripts/
+        cp data/resources/resources.gresource package/usr/share/lyargoos-welcome/
+        
+        cd package
+        tar -czf "../lyargoos-welcome-${TAG:-dev}-linux-${ARCH}.tar.gz" usr
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: lyargoos-welcome-linux-${{ matrix.arch }}
+        path: lyargoos-welcome-*.tar.gz
+
+    - name: Create GitHub Release
+      if: github.event.inputs.release == 'true' && github.event.inputs.tag != ''
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ github.event.inputs.tag }}
+        name: LyargoOS Welcome ${{ github.event.inputs.tag }}
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Upload to Release
+      if: github.event.inputs.release == 'true' && github.event.inputs.tag != ''
+      env:
+        TAG: ${{ github.event.inputs.tag }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release upload "$TAG" lyargoos-welcome-*.tar.gz

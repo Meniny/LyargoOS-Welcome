@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.lyargoos.Welcome</id>
+  <name>LyargoOS Welcome</name>
+  <summary>LyargoOS Welcome Screen</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <description>
+    <p>LyargoOS Welcome provides quick access to system updates
+and virtualization setup for LyargoOS Linux.</p>
+  </description>
+  <url type="homepage">https://github.com/Meniny/LyargoOS</url>
+  <url type="vcs-browser">https://github.com/Meniny/LyargoOS-Welcome</url>
+  <url type="bugtracker">https://github.com/Meniny/LyargoOS/issues</url>
+  <launchable type="desktop-id">org.lyargoos.Welcome.desktop</launchable>
+</component>
